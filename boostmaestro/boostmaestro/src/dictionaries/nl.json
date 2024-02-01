@@ -4,29 +4,9 @@
       "label": "Home",
       "href": "/"
     },
-    "benefits": {
-      "label": "Voordelen",
-      "href": "/benefits"
-    },
-    "success": {
-      "label": "Selectie Masterclass",
-      "href": "/selection"
-    },
-    "transformation": {
-      "label": "Transformatie Masterclass",
-      "href": "/transformation"
-    },
-    "investment": {
-      "label": "Kosten & Data",
-      "href": "/pricing"
-    },
     "about": {
       "label": "Over Guus",
       "href": "/about"
-    },
-    "reviews": {
-      "label": "Ervaringen",
-      "href": "/reviews"
     },
     "contact": {
       "label": "Contact",

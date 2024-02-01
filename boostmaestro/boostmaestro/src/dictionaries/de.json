@@ -4,29 +4,9 @@
       "label": "Home",
       "href": "/"
     },
-    "benefits": {
-      "label": "Vorteile",
-      "href": "/benefits"
-    },
-    "success": {
-      "label": "Selection Masterclass",
-      "href": "/selection"
-    },
-    "transformation": {
-      "label": "Transformation Masterclass",
-      "href": "/transformation"
-    },
-    "investment": {
-      "label": "Preise & Termine",
-      "href": "/pricing"
-    },
     "about": {
       "label": "Über Guus",
       "href": "/about"
-    },
-    "reviews": {
-      "label": "Bewertungen",
-      "href": "/reviews"
     },
     "contact": {
       "label": "Kontakt",
