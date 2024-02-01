@@ -1,6 +1,5 @@
 import '../../styles/globals.css'
 import { NextAuthProvider } from "@/lib/providers"
-import { HeaderVisibilityProvider } from '@/contexts/HeaderVisibilityContext'
 import { Locale, i18n } from '@/app/../../i18n.config'
 import { Inter } from 'next/font/google'
 import type { Metadata } from 'next'
@@ -15,9 +14,9 @@ export async function generateStaticParams() {
 }
 
 export const metadata: Metadata = {
-  title: 'ERP Masterclasses',
-  description: 'Guus Krabbenborg nodigt u uit voor masterclasses over ERP en digitale transformatie.',
-  metadataBase: new URL('https://erpmasterclasses.com'),
+  title: 'Boost Maestro',
+  description: 'Virtuele boost. Echte resultaten. Website? Check. SEO? Check. Social media? Check. E-mail marketing? Check. Alles wat je nodig hebt om je bedrijf te laten groeien.',
+  metadataBase: new URL('https://boostmaestro.com'),
 }
 
 export default function RootLayout({
