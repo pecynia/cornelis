@@ -1,4 +1,3 @@
-// /api/auth/signin/page.tsx
 "use client"
 
 import { NextPage } from "next"
@@ -18,7 +17,7 @@ let validationSchema = yup.object().shape({
   password: yup.string()
       .required('Wachtwoord is vereist')
       .min(6, 'Wachtwoord moet minimaal 6 karakters bevatten')
-      .max(12, 'Wachtwoord mag maximaal 32 karakters bevatten')
+      .max(20, 'Wachtwoord mag maximaal 20 karakters bevatten')
 })
 
 const SignInPage: NextPage = () => {

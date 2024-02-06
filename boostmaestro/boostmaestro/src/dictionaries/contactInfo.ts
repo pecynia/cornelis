@@ -22,12 +22,12 @@ interface ContactInfo {
 }
 
 export const contactInfo: ContactInfo = {
-    name: "ERP Masterclasses",
+    name: "Boost Maestro",
     address: `${location.street} ${location.number}, ${location.zip} ${location.city}`,
-    email: "gk@erpmasterclasses.com",
-    phone: "+31 622 496 073 ",
-    kvk: "09122310",
-    vatNumber: "NL809924328B01",
+    email: "contact@boostmaestro.com",
+    phone: "+31 623 770 652 ",
+    kvk: "change",
+    vatNumber: "change",
 }
 
 interface SocialMedia {

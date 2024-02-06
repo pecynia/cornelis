@@ -55,12 +55,27 @@ export async function getParagraphJson(documentId: string, locale: Locale) {
     // Constructing the response to match the original format
     if (result && result.content && result.content[locale]) {
         return {
-            _id: result._id,
-            paragraphJson: result.content[locale]
+            _id: result._id as string,
+            paragraphJson: result.content[locale] as JSONContent
         }
     }
     
     return null
+}
+
+// Get document given id
+export type Document = {
+    _id: string
+    content: {
+        [key in Locale]: JSONContent
+    }
+}
+export async function getDocument(documentId: string) {
+    const db = await connectToDatabase()
+    const collection = db.collection('content')
+    const result = await collection.findOne({ _id: documentId }) as Document
+
+    return result
 }
 
 
@@ -76,6 +91,8 @@ export async function saveParagraphJson(documentId: string, locale: Locale, para
     }
 
     const result = await collection.updateOne(filter, update, { upsert: true })
+
+    revalidateTag(`fetch-paragraph-${documentId}`)
 
     return result
 }

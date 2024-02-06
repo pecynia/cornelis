@@ -13,9 +13,8 @@ import CustomBulletList from '@/app/[lang]/components/editor/CustomBulletList'
 import { generateJSON } from '@tiptap/html'
 import MenuBar from '@/app/[lang]/components/editor/MenuBar'
 import { Button } from '@/app/[lang]/components/ui/button'
-import { motion } from 'framer-motion'
 import EditorLocaleSwitcher from '@/app/[lang]/components/editor/EditorLocaleSwitcher'
-import { Locale } from '../../../../../i18n.config'
+import { Locale } from '@../../../i18n.config'
 
 interface EditorComponentProps {
     initialContent?: string
@@ -54,7 +53,7 @@ const EditorComponent: React.FC<EditorComponentProps> = ({
                 },
             }),
         ],
-        content: '',
+        content: initialContent,
         editorProps: {
             attributes: {
                 class: 'prose max-w-none w-full',
@@ -68,11 +67,11 @@ const EditorComponent: React.FC<EditorComponentProps> = ({
         },
     })
 
+    // Set the initial content if it exists
     useEffect(() => {
         if (initialContent) {
             editor?.commands.setContent(initialContent)
         }
-        console.log("Writing lang:", currentLocale)
     }, [initialContent, editor, currentLocale])
 
     const handleLocaleChange = (newLocale: Locale) => {
@@ -105,28 +104,18 @@ const EditorComponent: React.FC<EditorComponentProps> = ({
         }
     }
 
-
     return (
-        <motion.div
-            layout
-            transition={{ type: "spring", ease: "easeInOut", duration: 0.1 }}
-            className='relative flex flex-col'
-        >
-            {editable && (
-                <>
-                    <MenuBar editor={editor} />
-                </>
-            )}
-            <motion.div layout>
-                <EditorContent editor={editor} />
-            </motion.div>
-
+        <div className='relative flex flex-col'>
+            {editable && <MenuBar editor={editor} />}
+            <EditorContent editor={editor} />
             {editable && (
                 <div className='relative'>
+                    
                     {/* Locale switcher, bottom left below the text area  */}
                     <div className="absolute flex justify-start bottom-0 right-0 left-[50%] -mb-14 -ml-1/2" style={{ transform: 'translateX(-100%)' }} >
                         <EditorLocaleSwitcher currentLocale={currentLocale} onLocaleChange={handleLocaleChange} />
                     </div>
+                    
                     {/* Save button, bottom right below the text area  */}
                     <div className="absolute flex justify-end bottom-0 right-0 -mb-14">
                         {hasChanges && (
@@ -143,7 +132,7 @@ const EditorComponent: React.FC<EditorComponentProps> = ({
                     </div>
                 </div>
             )}
-        </motion.div>
+        </div>
     )
 }
 
