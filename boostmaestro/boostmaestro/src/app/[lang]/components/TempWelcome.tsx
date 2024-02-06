@@ -25,7 +25,7 @@ export default function TempWelcome({ lang, contact, errorMessages }: { lang: Lo
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ type: "spring", ease: "easeInOut", duration: 0.5, delay: 0.2}}
                 viewport={{ once: true }}
-            >
+            > 
                 <h1 className='text-3xl sm:text-4xl font-normal font-primary pb-4 pt-14 sm:pt-0 z-10'>{contact.title}</h1>
             </motion.div>
 
