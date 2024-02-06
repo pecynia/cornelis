@@ -29,11 +29,11 @@ export default function RootLayout({
 
   return (
     <html lang={params.lang} className={`${inter.className} h-full`}>
-      <body className='flex min-h-full flex-col font-exo'>
+      <body className='flex min-h-full flex-col font-raleway'>
         <NextAuthProvider>
-          <Header lang={params.lang} />
+          {/* <Header lang={params.lang} /> */}
           <main className='flex-grow'>{children}</main>
-          <Footer lang={params.lang} />
+          {/* <Footer lang={params.lang} /> */}
         </NextAuthProvider>
       </body>
     </html>

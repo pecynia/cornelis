@@ -83,6 +83,7 @@
     "registerButton": "Register"
   },
   "contact": {
+    "callUsOn": "Call us on",
     "title": "Contact",
     "registrationFormTitle": "Register for the Masterclass",
     "selectMasterclass": "Select Masterclass",

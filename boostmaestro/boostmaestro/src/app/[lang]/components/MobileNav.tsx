@@ -25,7 +25,7 @@ const MobileNav = ({ routes, lang }: { routes: Navigation, lang: Locale }) => {
                     <LocaleSwitchButton locale={lang} />
                 </Suspense>
 
-                {/* Sheet  */}
+                Sheet 
                 <Sheet open={open} onOpenChange={setOpen}>
                     <SheetTrigger asChild>
                         <div className='flex rounded-full p-2 cursor-pointer'>

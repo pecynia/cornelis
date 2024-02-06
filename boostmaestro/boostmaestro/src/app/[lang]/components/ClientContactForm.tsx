@@ -8,11 +8,14 @@ import { ContactFormSchema } from '@/lib/schema'
 import { sendContactEmail } from '@/app/_actions'
 import { toast } from 'sonner'
 import { motion } from 'framer-motion'
+import Link from 'next/link'
+import { contactInfo } from '@/dictionaries/contactInfo'
 
 export type ContactFormInputs = z.infer<typeof ContactFormSchema>
 
 export type ClientContactFormProps = {
   localization: {
+    callUsOn: string
     namePlaceholder: string
     emailPlaceholder: string
     companyNamePlaceholder: string
@@ -63,11 +66,28 @@ const ClientContactForm: React.FC<ClientContactFormProps> = ({ localization, err
     >
       <div className='w-full pt-2'>
         <form onSubmit={handleSubmit(processForm)} className='mx-auto flex flex-1 flex-col gap-4'>
+
+          {/* Contact Info Section */}
+          <div className='flex flex-col md:flex-row justify-center items-center gap-2 md:gap-5 py-2'>
+            <div className='flex items-center gap-2'>
+              Email:
+              <Link href={`mailto:${contactInfo.email}`} className='hover:text-gray-300 underline'>
+                {contactInfo.email}
+              </Link>
+            </div>
+            <div className='flex items-center gap-2'>
+              {localization.callUsOn}:
+              <Link href={`tel:${contactInfo.phone}`} className='hover:text-gray-300 underline'>
+                {contactInfo.phone}
+              </Link>
+            </div>
+          </div>
+
           {/* Company Name Input */}
           <input
             {...register('companyName')}
             placeholder={localization.companyNamePlaceholder}
-            className='w-1/2 rounded-lg p-2 border-2 border-gray-100'
+            className='w-full sm:w-1/2 rounded-lg p-2 border-2 border-gray-100'
           />
           {errors.companyName && <p className='text-sm text-red-400'>{errorMessages.companyNameRequired}</p>}
 
@@ -75,7 +95,7 @@ const ClientContactForm: React.FC<ClientContactFormProps> = ({ localization, err
           <input
             {...register('name')}
             placeholder={localization.namePlaceholder}
-            className='w-1/2 rounded-lg p-2 border-2 border-gray-100'
+            className='w-full sm:w-1/2 rounded-lg p-2 border-2 border-gray-100'
           />
           {errors.name && <p className='text-sm text-red-400'>{errorMessages.nameRequired}</p>}
 
@@ -83,7 +103,7 @@ const ClientContactForm: React.FC<ClientContactFormProps> = ({ localization, err
           <input
             {...register('email')}
             placeholder={localization.emailPlaceholder}
-            className='w-2/3 rounded-lg p-2 border-2 border-gray-100'
+            className='w-full sm:w-2/3 rounded-lg p-2 border-2 border-gray-100'
           />
           {errors.email && <p className='text-sm text-red-400'>
             {errors.email.message === '1' ? errorMessages.emailRequired : errorMessages.invalidEmail}

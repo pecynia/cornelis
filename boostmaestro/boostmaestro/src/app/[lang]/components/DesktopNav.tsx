@@ -34,7 +34,8 @@ const DesktopNav = ({ routes, lang }: { routes: Navigation, lang: Locale }) => {
                     <ClientHeaderButtonWrapper />
                     <Suspense fallback={<div></div>}>
                         <LocaleSwitchButton locale={lang} />
-                    </Suspense>                </div>
+                    </Suspense>                
+                </div>
             </nav>
         </div>
 

@@ -24,8 +24,8 @@ export async function sendContactEmail(data: ContactFormInputs) {
     const { companyName, name, email, message } = result.data
     try {
       const emailData = await resend.emails.send({
-        from: 'ERP Masterclass <contact@erpmasterclasses.com>',
-        to: ['gk@dynamicsandmore.com'],
+        from: 'Boost Maestro <info@boostmaestro.com>',
+        to: ['contact@boostmaestro.com'],
         subject: 'Contact form submission',
         text: `Company Name: ${companyName}\nName: ${name}\nEmail: ${email}\nMessage: ${message}`,
         react: ContactFormEmail({ companyName, name, email, message }),
