@@ -10,7 +10,7 @@ async function EditorWrapper({ initialLocale, documentId }: { initialLocale: Loc
     console.log(result?.paragraphJson.content)
 
     return (
-        <div>EditorWrapper</div>
+        <div>{JSON.stringify(result?.paragraphJson.content)}</div>
     )
 }
 
