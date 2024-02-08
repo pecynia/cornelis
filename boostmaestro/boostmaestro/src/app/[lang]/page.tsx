@@ -11,10 +11,10 @@ export default function Home({
   return (
     <div className='bg-background relative'>
       <div className="relative container mx-auto px-4">
-        {/* <div className='border-2'>
-          <EditorWrapper documentId='home-letter' initialLocale={lang} />
-        </div> */}
         <EditorServer documentId='home-letter' initialLocale={lang} />
+        {/* <EditorServer documentId='home-letter-2' initialLocale={lang} />
+        <EditorServer documentId='home-letter-3' initialLocale={lang} />
+        <EditorServer documentId='home-letter-4' initialLocale={lang} /> */}
       </div>
     </div>
   )
