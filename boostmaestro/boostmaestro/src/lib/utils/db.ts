@@ -92,8 +92,6 @@ export async function saveParagraphJson(documentId: string, locale: Locale, para
 
     const result = await collection.updateOne(filter, update, { upsert: true })
 
-    revalidateTag(`fetch-paragraph-${documentId}`)
-
     return result
 }
 

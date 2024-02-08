@@ -15,6 +15,7 @@ import MenuBar from '@/app/[lang]/components/editor/MenuBar'
 import { Button } from '@/app/[lang]/components/ui/button'
 import EditorLocaleSwitcher from '@/app/[lang]/components/editor/EditorLocaleSwitcher'
 import { Locale } from '@../../../i18n.config'
+import { saveParagraph } from '@/app/_actions'
 
 interface EditorComponentProps {
     initialContent?: string
@@ -82,16 +83,8 @@ const EditorComponent: React.FC<EditorComponentProps> = ({
     const handleSave = async () => {
         setIsSaving(true)
         try {
-            const res = await fetch('/api/save', {
-                method: 'POST',
-                body: JSON.stringify(editorContent),
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Document-ID': documentId,
-                    'Locale': currentLocale
-                },
-            })
-            if (res.ok) {
+            const res = await saveParagraph(documentId, currentLocale, JSON.stringify(editorContent))
+            if (res.success) {
                 toast.success('Saved successfully!')
             } else {
                 toast.error('Oops, something went wrong. Please try again later.')
@@ -110,12 +103,12 @@ const EditorComponent: React.FC<EditorComponentProps> = ({
             <EditorContent editor={editor} />
             {editable && (
                 <div className='relative'>
-                    
+
                     {/* Locale switcher, bottom left below the text area  */}
                     <div className="absolute flex justify-start bottom-0 right-0 left-[50%] -mb-14 -ml-1/2" style={{ transform: 'translateX(-100%)' }} >
                         <EditorLocaleSwitcher currentLocale={currentLocale} onLocaleChange={handleLocaleChange} />
                     </div>
-                    
+
                     {/* Save button, bottom right below the text area  */}
                     <div className="absolute flex justify-end bottom-0 right-0 -mb-14">
                         {hasChanges && (

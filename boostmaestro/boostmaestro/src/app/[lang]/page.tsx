@@ -1,6 +1,6 @@
 import { Locale } from '@/app/../../i18n.config'
+import EditorServer from '@/app/[lang]/components/editor/EditorServer'
 import EditorWrapper from '@/app/[lang]/components/editor/EditorWrapper'
-import EditorStaticHandler from '@/app/[lang]/components/editor/EditorStaticHandler'
 
 export default function Home({
   params: { lang }
@@ -10,9 +10,11 @@ export default function Home({
 
   return (
     <div className='bg-background relative'>
-      <div className="relative container mx-auto px-4 pt-48">
-        {/* <EditorStaticHandler documentId='home-letter' initialLocale={lang} /> */}
-        <EditorWrapper documentId='home-letter' initialLocale={lang} />
+      <div className="relative container mx-auto px-4">
+        {/* <div className='border-2'>
+          <EditorWrapper documentId='home-letter' initialLocale={lang} />
+        </div> */}
+        <EditorServer documentId='home-letter' initialLocale={lang} />
       </div>
     </div>
   )

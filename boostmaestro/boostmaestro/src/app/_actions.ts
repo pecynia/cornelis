@@ -9,9 +9,12 @@ import { addEvent, getEventsWithRegistrations, getEvents, deleteEvent, updateEve
 import { CreateEventProps, EventData, EventProps, RegistrationFormProps } from '@/../typings'
 import { Locale } from '../../i18n.config'
 import RegistrationConfirmationEmail from '@/emails/registration-confirmation-email'
+import { saveParagraphJson } from '@/lib/utils/db'
+import { JSONContent } from '@tiptap/react'
+import { revalidateTag } from 'next/cache'
+
 
 // ------------------ CONTACT FORMS ------------------
-
 
 const resend = new Resend(process.env.RESEND_API_KEY)
 
@@ -127,7 +130,7 @@ export async function updateEventInDatabase(data: EventData) {
 
 // ------------------ CONTENT ACTIONS ------------------
 
-// Server action
+// Get paragraph from database
 export async function getParagraph(id: string, locale: Locale) {
   try {
     const result = await getParagraphJson(id, locale)
@@ -138,6 +141,24 @@ export async function getParagraph(id: string, locale: Locale) {
     }
   } catch (error) {
     console.error("Error in getParagraph:", error)
+    return { success: false, error: "Server error" }
+  }
+}
+
+// Save paragraph to database
+export async function saveParagraph(documentId: string, locale: Locale, paragraphJson: string) {
+  const paragraph = JSON.parse(paragraphJson) as JSONContent
+
+  try {
+    const result = await saveParagraphJson(documentId, locale, paragraph)
+
+    if (result.acknowledged) {
+      revalidateTag(`fetch-paragraph-${documentId}`)
+    }
+
+    return { success: true, data: result }
+  } catch (error) {
+    console.error("Error in saveParagraph:", error)
     return { success: false, error: "Server error" }
   }
 }
