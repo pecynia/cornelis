@@ -1,5 +1,8 @@
 import type { NextAuthOptions } from "next-auth"
 import CredentialsProvider from "next-auth/providers/credentials"
+import { connectMongoDB } from "@/lib/mongodb"
+import User from "@/models/user"
+import bcrypt from "bcryptjs"
 
 export const authOptions: NextAuthOptions = {
   session: {
@@ -8,18 +11,35 @@ export const authOptions: NextAuthOptions = {
   providers: [
     CredentialsProvider({
       credentials: {
-        password: { label: "Wachtwoord", type: "password" },
+        email: { label: "Email", type: "email" },
+        password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
-        const { password } = credentials as { password: string }
-                if (password === process.env.ADMIN_PASSWORD) {
-                    return { id: "1", name: "Admin" }
-                } else {
-                    return null
-                }
+        const { email, password } = credentials as { email: string, password: string };
+
+        try {
+          await connectMongoDB()
+          const user = await User.findOne({ email })
+
+          if (!user) {
+            return null
+          }
+
+          const passwordsMatch = await bcrypt.compare(password, user.password)
+
+          if (!passwordsMatch) {
+            return null
+          }
+
+          return user
+        } catch (e) {
+          console.error(e)
+          return null
+        }
       },
     }),
   ],
+  secret: process.env.NEXTAUTH_SECRET,
   pages: {
     signIn: '/api/auth/signin',
   },
@@ -28,7 +48,6 @@ export const authOptions: NextAuthOptions = {
       if (trigger === 'update' && session?.name) {
         token.name = session.name
       }
-
       return token
     }
   },
