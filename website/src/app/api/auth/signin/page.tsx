@@ -1,6 +1,6 @@
-// /api/auth/signin/page.tsx
 "use client"
 
+import { useState } from "react"
 import { signIn } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import * as yup from 'yup'
@@ -14,12 +14,13 @@ import Link from "next/link"
 import { Locale, i18n } from "@../../../i18n.config"
 import { useSearchParams } from 'next/navigation'
 import { emailIsVerified } from "@/app/_actions"
+import { initiateEmailVerification } from "@/app/_actions"
 
 let validationSchema = yup.object().shape({
     password: yup.string()
         .required('Wachtwoord is vereist')
         .min(6, 'Wachtwoord moet minimaal 6 karakters bevatten')
-        .max(12, 'Wachtwoord mag maximaal 32 karakters bevatten'),
+        .max(32, 'Wachtwoord mag maximaal 32 karakters bevatten'),
     email: yup.string()
         .required('E-mail is vereist')
         .email('E-mail is onjuist')
@@ -59,18 +60,18 @@ export default function Page() {
             if (emailIsVerifiedResponse.success && emailIsVerifiedResponse.emailVerified) {
                 router.push(`/${lang}/dashboard`);
             } else {
-                // Open the verify email popup
-                console.log('Email is not verified');
+                // Initiate email verification and redirect to the verification page
+                initiateEmailVerification(data.email)
+                router.push(`/api/auth/verify-email?lang=${lang}&email=${encodeURIComponent(data.email)}`)
             }
         }
     }
-    
 
     return (
         <section className='flex min-h-screen overflow-hidden pt-16 sm:py-28'>
             <div className='mx-auto flex w-full max-w-2xl flex-col px-4 sm:px-6 items-center my-auto'>
                 <div className='bg-white rounded-xl sm:rounded-5xl w-full -mx-4 flex-auto bg-background px-4 header-shadow-right sm:mx-0 sm:flex-none sm:p-10'>
-                    The language is: {lang}
+                    <h1 className='text-2xl font-bold text-center text-gray-900'>Log in</h1>
                     <form onSubmit={handleSubmit(handleFormSubmit)}>
                         <div className='space-y-2'>
                             <label htmlFor='email' className='block text-md font-medium text-gray-700 -mb-1'>
@@ -123,7 +124,7 @@ export default function Page() {
                                 </>
                             )}
                         </Button>
-                        <Link href={`/${lang}/auth/register`}>
+                        <Link href={`/api/auth/register?lang=${lang}`}>
                             <p className='text-center mt-4 text-sm text-gray-600 hover:text-gray-900 hover:underline'>
                                 <UserPlus className="h-4 w-4 inline-block -mt-1" /> Nog geen account? Registreer
                             </p>

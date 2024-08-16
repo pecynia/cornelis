@@ -9,8 +9,9 @@ import { ReloadIcon } from "@radix-ui/react-icons"
 import { UserPlus } from "lucide-react"
 import Link from "next/link"
 import * as z from 'zod'
-import { registerNewUser, userExists } from "@/app/_actions"
-import { Locale } from "@../../../i18n.config"
+import { initiateEmailVerification, registerNewUser, userExists } from "@/app/_actions"
+import { i18n, Locale } from "@../../../i18n.config"
+import { useSearchParams } from 'next/navigation'
 
 const registerSchema = z.object({
     name: z.string().min(1, 'Naam is vereist'),
@@ -20,12 +21,18 @@ const registerSchema = z.object({
 
 type RegisterFormInputs = z.infer<typeof registerSchema>
 
-export default function Page({
-    params: { lang }
-}: {
-    params: { lang: Locale }
-}) {
+function validLocale(locale: string): locale is Locale {
+    return i18n.locales.includes(locale as Locale)
+}
+
+export default function Page() {
     const router = useRouter()
+    const searchParams = useSearchParams()
+    let lang = searchParams.get('lang') as Locale
+    if (!validLocale(lang)) {
+        lang = i18n.defaultLocale
+    }
+
     const { register, handleSubmit, formState: { errors, isSubmitting }, setError } = useForm<RegisterFormInputs>({
         resolver: zodResolver(registerSchema)
     })
@@ -44,7 +51,8 @@ export default function Page({
         const result = await registerNewUser(data.name, data.email, data.password)
 
         if (result.success) {
-            router.push(`/${lang}/dashboard`)
+            initiateEmailVerification(data.email)
+            router.push(`/api/auth/verify-email?lang=${lang}&email=${encodeURIComponent(data.email)}`)
         } else {
             setError('name', {
                 type: 'manual',
@@ -57,6 +65,7 @@ export default function Page({
         <section className='flex min-h-screen overflow-hidden pt-16 sm:py-28'>
             <div className='mx-auto flex w-full max-w-2xl flex-col px-4 sm:px-6 items-center my-auto'>
                 <div className='bg-white rounded-xl sm:rounded-5xl w-full -mx-4 flex-auto bg-background px-4 header-shadow-right sm:mx-0 sm:flex-none sm:p-10'>
+                    <h1 className='text-2xl font-bold text-center text-gray-900'>Registreer</h1>
                     <form onSubmit={handleSubmit(handleFormSubmit)}>
                         <div className='space-y-2'>
                             <label htmlFor='name' className='block text-md font-medium text-gray-700 -mb-1'>
@@ -69,6 +78,7 @@ export default function Page({
                                 className='mt-1 block w-full text-sm py-2 px-3 border border-gray-300 rounded-md'
                                 placeholder='Vul je naam in'
                                 {...register('name')}
+                                autoFocus
                             />
                             {errors['name'] ? (
                                 <div className='text-sm text-red-500'>{errors['name'].message}</div>
@@ -104,7 +114,6 @@ export default function Page({
                                 className='mt-1 block w-full text-sm py-2 px-3 border border-gray-300 rounded-md'
                                 placeholder='Vul je wachtwoord in'
                                 {...register('password')}
-                                autoFocus
                             />
                             {errors['password'] ? (
                                 <div className='text-sm text-red-500'>{errors['password'].message}</div>
@@ -126,7 +135,7 @@ export default function Page({
                                 </>
                             )}
                         </Button>
-                        <Link href={`/${lang}/auth/signin`}>
+                        <Link href={`/api/auth/signin?lang=${lang}`}>
                             <p className='text-center mt-4 text-sm text-gray-600 hover:text-gray-900 hover:underline'>
                                 Al een account? Log in
                             </p>
