@@ -1,8 +1,8 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect } from "react"
 import { signIn } from "next-auth/react"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import * as yup from 'yup'
 import { useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
@@ -12,7 +12,6 @@ import { LogIn, UserPlus } from "lucide-react"
 import { ReloadIcon } from "@radix-ui/react-icons"
 import Link from "next/link"
 import { Locale, i18n } from "@../../../i18n.config"
-import { useSearchParams } from 'next/navigation'
 import { emailIsVerified } from "@/app/_actions"
 import { initiateEmailVerification } from "@/app/_actions"
 
@@ -38,9 +37,20 @@ export default function Page() {
         lang = i18n.defaultLocale
     }
 
-    const { setError, register, handleSubmit, formState: { errors, isSubmitting } } = useForm({
-        resolver: yupResolver(validationSchema)
+    const email = searchParams.get('email') || ''
+
+    const { setError, register, handleSubmit, setValue, formState: { errors, isSubmitting } } = useForm({
+        resolver: yupResolver(validationSchema),
+        defaultValues: {
+            email: email,
+        }
     })
+
+    useEffect(() => {
+        if (email) {
+            setValue('email', email)
+        }
+    }, [email, setValue])
 
     const handleFormSubmit = async (data: { password: string, email: string }) => {
         const result = await signIn('credentials', {
@@ -48,7 +58,7 @@ export default function Page() {
             password: data.password,
             email: data.email
         });
-    
+
         if (result!.error) {
             setError('password', {
                 type: 'manual',
@@ -61,7 +71,7 @@ export default function Page() {
                 router.push(`/${lang}/dashboard`);
             } else {
                 // Initiate email verification and redirect to the verification page
-                initiateEmailVerification(data.email)
+                await initiateEmailVerification(data.email)
                 router.push(`/api/auth/verify-email?lang=${lang}&email=${encodeURIComponent(data.email)}`)
             }
         }

@@ -13,6 +13,7 @@ import { initiateEmailVerification, registerNewUser, userExists } from "@/app/_a
 import { i18n, Locale } from "@../../../i18n.config"
 import { useSearchParams } from 'next/navigation'
 
+
 const registerSchema = z.object({
     name: z.string().min(1, 'Naam is vereist'),
     email: z.string().email('E-mail is onjuist'),

@@ -1,4 +1,6 @@
 import '@/styles/globals.css'
+import { Suspense } from 'react'
+import { Toaster } from 'sonner'
 
 export const metadata = {
   title: 'Login',
@@ -13,7 +15,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        {children}
+        <Suspense fallback={<div>Loading...</div>}>
+          {children}
+        </Suspense>
+        <Toaster position="top-center" duration={1500} richColors expand closeButton />
       </body>
     </html>
   )

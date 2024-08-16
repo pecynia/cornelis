@@ -1,9 +1,14 @@
 import React from 'react'
+import { Locale } from '@../../../i18n.config'
 
-function page() {
+export default function Page({
+  params: { lang }
+}: {
+  params: { lang: Locale }
+}) {
   return (
-    <div>admin content</div>
+    <div>
+      {lang}
+    </div>
   )
 }
-
-export default page

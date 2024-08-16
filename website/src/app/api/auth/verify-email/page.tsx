@@ -8,9 +8,10 @@ import { yupResolver } from '@hookform/resolvers/yup'
 import { Button } from "@/app/components/ui/button"
 import { Input } from "@/app/components/ui/input"
 import { ReloadIcon } from "@radix-ui/react-icons"
-import { verifyEmail, initiateEmailVerification } from "@/app/_actions"
+import { verifyEmail, emailIsVerified, initiateEmailVerification } from "@/app/_actions"
 import { Locale, i18n } from "@../../../i18n.config"
 import { toast } from "sonner"
+import { signIn } from "next-auth/react"
 
 let validationSchema = yup.object().shape({
     email: yup.string().email('E-mail is onjuist').required('E-mail is vereist'),
@@ -42,6 +43,20 @@ export default function VerifyEmailPage() {
         }
     })
 
+    // Check if the email is already verified
+    useEffect(() => {
+        const checkEmailVerification = async () => {
+            if (email) {
+                const emailVerificationResult = await emailIsVerified(email)
+                if (emailVerificationResult.success && emailVerificationResult.emailVerified) {
+                    toast('Email already verified, please log in.')
+                    router.push(`/api/auth/signin?lang=${lang}&email=${encodeURIComponent(email)}`)
+                }
+            }
+        }
+        checkEmailVerification()
+    }, [email, lang, router])
+
     // If email is provided, disable the email input
     useEffect(() => {
         if (email) {
@@ -57,8 +72,11 @@ export default function VerifyEmailPage() {
         const result = await verifyEmail(data.email, data.token)
 
         if (result.success) {
-            toast('Email verified successfully')
-            router.push(`/${lang}/dashboard`)
+            await signIn('credentials', {
+                redirect: false,
+                email: data.email,
+                callbackUrl: `/${lang}/dashboard`, // Redirect to the dashboard after sign-in
+            })
         } else {
             if (result.expired) {
                 setIsTokenExpired(true)
