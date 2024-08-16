@@ -11,6 +11,9 @@ import { Input } from "@/app/components/ui/input"
 import { LogIn, UserPlus } from "lucide-react"
 import { ReloadIcon } from "@radix-ui/react-icons"
 import Link from "next/link"
+import { Locale, i18n } from "@../../../i18n.config"
+import { useSearchParams } from 'next/navigation'
+import { emailIsVerified } from "@/app/_actions"
 
 let validationSchema = yup.object().shape({
     password: yup.string()
@@ -22,8 +25,18 @@ let validationSchema = yup.object().shape({
         .email('E-mail is onjuist')
 })
 
-const SignInPage = () => {
+function validLocale(locale: string): locale is Locale {
+    return i18n.locales.includes(locale as Locale)
+}
+
+export default function Page() {
     const router = useRouter()
+    const searchParams = useSearchParams()
+    let lang = searchParams.get('lang') as Locale
+    if (!validLocale(lang)) {
+        lang = i18n.defaultLocale
+    }
+
     const { setError, register, handleSubmit, formState: { errors, isSubmitting } } = useForm({
         resolver: yupResolver(validationSchema)
     })
@@ -33,22 +46,31 @@ const SignInPage = () => {
             redirect: false,
             password: data.password,
             email: data.email
-        })
-
+        });
+    
         if (result!.error) {
             setError('password', {
                 type: 'manual',
                 message: 'Password is incorrect'
-            })
+            });
         } else {
-            router.push('/dashboard')
+            // Check if the email is verified
+            const emailIsVerifiedResponse = await emailIsVerified(data.email)
+            if (emailIsVerifiedResponse.success && emailIsVerifiedResponse.emailVerified) {
+                router.push(`/${lang}/dashboard`);
+            } else {
+                // Open the verify email popup
+                console.log('Email is not verified');
+            }
         }
     }
+    
 
     return (
         <section className='flex min-h-screen overflow-hidden pt-16 sm:py-28'>
             <div className='mx-auto flex w-full max-w-2xl flex-col px-4 sm:px-6 items-center my-auto'>
                 <div className='bg-white rounded-xl sm:rounded-5xl w-full -mx-4 flex-auto bg-background px-4 header-shadow-right sm:mx-0 sm:flex-none sm:p-10'>
+                    The language is: {lang}
                     <form onSubmit={handleSubmit(handleFormSubmit)}>
                         <div className='space-y-2'>
                             <label htmlFor='email' className='block text-md font-medium text-gray-700 -mb-1'>
@@ -61,6 +83,7 @@ const SignInPage = () => {
                                 className='mt-1 block w-full text-sm py-2 px-3 border border-gray-300 rounded-md'
                                 placeholder='Vul je e-mail in'
                                 {...register('email')}
+                                autoFocus
                             />
                             {errors['email'] ? (
                                 <div className='text-sm text-red-500'>{errors['email'].message}</div>
@@ -79,7 +102,6 @@ const SignInPage = () => {
                                 className='mt-1 block w-full text-sm py-2 px-3 border border-gray-300 rounded-md'
                                 placeholder='Vul je wachtwoord in'
                                 {...register('password')}
-                                autoFocus
                             />
                             {errors['password'] ? (
                                 <div className='text-sm text-red-500'>{errors['password'].message}</div>
@@ -101,7 +123,7 @@ const SignInPage = () => {
                                 </>
                             )}
                         </Button>
-                        <Link href='/api/auth/register'>
+                        <Link href={`/${lang}/auth/register`}>
                             <p className='text-center mt-4 text-sm text-gray-600 hover:text-gray-900 hover:underline'>
                                 <UserPlus className="h-4 w-4 inline-block -mt-1" /> Nog geen account? Registreer
                             </p>
@@ -112,5 +134,3 @@ const SignInPage = () => {
         </section>
     )
 }
-
-export default SignInPage

@@ -1,13 +1,15 @@
 import type { NextAuthOptions } from "next-auth"
 import CredentialsProvider from "next-auth/providers/credentials"
-import { connectMongoDB } from "@/lib/mongodb"
-import User from "@/models/user"
+import EmailProvider from 'next-auth/providers/email'
 import bcrypt from "bcryptjs"
+import prisma from "@/lib/prisma"
+import { PrismaAdapter } from "@next-auth/prisma-adapter"
 
 export const authOptions: NextAuthOptions = {
   session: {
     strategy: "jwt",
   },
+  adapter: PrismaAdapter(prisma),
   providers: [
     CredentialsProvider({
       credentials: {
@@ -15,17 +17,22 @@ export const authOptions: NextAuthOptions = {
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
-        const { email, password } = credentials as { email: string, password: string };
+        const { email, password } = credentials as { email: string, password: string }
 
         try {
-          await connectMongoDB()
-          const user = await User.findOne({ email })
+          // Check if the user exists in postgress database
+          const user = await prisma.user.findUnique({
+            where: {
+              email,
+            },
+          })
 
           if (!user) {
             return null
           }
 
-          const passwordsMatch = await bcrypt.compare(password, user.password)
+          // Check if the password is correct
+          const passwordsMatch = bcrypt.compare(password, user.hashedPassword)
 
           if (!passwordsMatch) {
             return null
@@ -41,7 +48,7 @@ export const authOptions: NextAuthOptions = {
   ],
   secret: process.env.NEXTAUTH_SECRET,
   pages: {
-    signIn: '/api/auth/signin',
+    signIn: '/auth/signin',
   },
   callbacks: {
     async jwt({ token, trigger, session }) {
