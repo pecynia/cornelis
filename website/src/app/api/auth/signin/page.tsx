@@ -118,6 +118,11 @@ export default function Page() {
                                 <div className='text-sm text-red-500'>{errors['password'].message}</div>
                             ) : null}
                         </div>
+                        <Link href={`/api/auth/forgot-password?lang=${lang}`}>
+                            <p className='text-right mt-2 mb-1 text-sm text-gray-500 hover:text-gray-900 hover:underline'>
+                                Wachtwoord vergeten?
+                            </p>
+                        </Link>
                         <Button
                             type='submit'
                             className='mt-3 w-full py-2 px-4 rounded'
