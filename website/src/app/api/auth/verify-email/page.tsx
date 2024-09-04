@@ -34,6 +34,7 @@ export default function VerifyEmailPage() {
         lang = i18n.defaultLocale
     }
     const email = searchParams.get('email') || ''
+    const token = searchParams.get('token') || ''
 
     const { register, handleSubmit, setValue, formState: { errors } } = useForm({
         resolver: yupResolver(validationSchema),
@@ -43,10 +44,10 @@ export default function VerifyEmailPage() {
         }
     })
 
-    // Check if the email is already verified
+    // Check if the email is already verified, but only if there is no token
     useEffect(() => {
         const checkEmailVerification = async () => {
-            if (email) {
+            if (email && !token) {
                 const emailVerificationResult = await emailIsVerified(email)
                 if (emailVerificationResult.success && emailVerificationResult.emailVerified) {
                     toast('Email already verified, please log in.')
@@ -55,14 +56,21 @@ export default function VerifyEmailPage() {
             }
         }
         checkEmailVerification()
-    }, [email, lang, router])
+    }, [email, token, lang, router])
 
-    // If email is provided, disable the email input
+    // If email is provided, set it in the form
     useEffect(() => {
         if (email) {
             setValue('email', email)
         }
     }, [email, setValue])
+
+    // Automatically submit the form if both email and token are provided
+    useEffect(() => {
+        if (email && token) {
+            handleFormSubmit({ email, token })
+        }
+    }, [email, token])
 
     const handleFormSubmit = async (data: { email: string, token: string }) => {
         setIsSubmitting(true)
@@ -89,7 +97,7 @@ export default function VerifyEmailPage() {
 
     const handleResendToken = async () => {
         if (!email) return
-        const result = await initiateEmailVerification(email)
+        const result = await initiateEmailVerification(email, 'code')
         if (result.success) {
             toast('Verification code has been resent to your email.')
         } else {

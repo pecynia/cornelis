@@ -52,7 +52,7 @@ export default function Page() {
         const result = await registerNewUser(data.name, data.email, data.password)
 
         if (result.success) {
-            initiateEmailVerification(data.email)
+            initiateEmailVerification(data.email, 'code')
             router.push(`/api/auth/verify-email?lang=${lang}&email=${encodeURIComponent(data.email)}`)
         } else {
             setError('name', {

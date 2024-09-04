@@ -6,6 +6,7 @@ import { PrismaAdapter } from "@next-auth/prisma-adapter"
 import { User } from "@prisma/client"
 import { DefaultSession } from "next-auth";
 
+
 // Extend the default session user type to include custom properties
 declare module "next-auth" {
   interface Session {
@@ -52,11 +53,12 @@ export const authOptions: NextAuthOptions = {
           return null
         }
       },
-    }),
+    }),    
   ],
   secret: process.env.NEXTAUTH_SECRET,
   pages: {
     signIn: '/api/auth/signin',
+    verifyRequest: '/api/auth/verify-email',
   },
   callbacks: {
     async jwt({ token, user, trigger, session }) {

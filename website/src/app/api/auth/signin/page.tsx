@@ -71,7 +71,7 @@ export default function Page() {
                 router.push(`/${lang}/dashboard`);
             } else {
                 // Initiate email verification and redirect to the verification page
-                await initiateEmailVerification(data.email)
+                await initiateEmailVerification(data.email, 'code')
                 router.push(`/api/auth/verify-email?lang=${lang}&email=${encodeURIComponent(data.email)}`)
             }
         }

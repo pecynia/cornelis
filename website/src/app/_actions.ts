@@ -2,6 +2,7 @@
 
 import bcrypt from "bcryptjs"
 import prisma from "@/lib/prisma"
+import { sendCodeVerificationRequest } from "@/lib/utils/sendCodeVerificationRequest"
 import { sendVerificationRequest } from "@/lib/utils/sendVerificationRequest"
 import { User } from "@prisma/client"
 
@@ -105,11 +106,12 @@ export async function emailIsVerified(email: string) {
   }
 }
 
-export async function initiateEmailVerification(email: string) {
+export async function initiateEmailVerification(email: string, type: "code" | "link") {
   /**
    * This function is used to add a verification token to the user
    *
    * @param {string} email - The email of the user
+   * @param {string} type - The type of verification (code or link)
    * @returns {object} - A JSON object with the success status and a message or an error
    */
   try {
@@ -123,7 +125,12 @@ export async function initiateEmailVerification(email: string) {
       return { success: false, message: "User not found" }
     }
     // Send the verification request
-    await sendVerificationRequest({ user })
+    if (type === "code") {
+      await sendCodeVerificationRequest({ user })
+    } else if (type === "link") {
+      await sendVerificationRequest({ user })
+    }
+
     return { success: true, message: "Verification request sent" }
   }
   catch (error) {
@@ -173,6 +180,7 @@ export async function verifyEmail(email: string, token: string) {
           },
         },
       })
+      // TODO: check if this edge case is handled and a new link can be send
       return { success: false, expired: true, message: "Token expired" }
     }
 
