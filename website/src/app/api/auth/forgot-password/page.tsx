@@ -16,7 +16,7 @@ export default function Page() {
             the database, or if too many requests are made in a short period of time. 
 
             For this last part we will use the rate limiting middleware in the api/auth/verify-email.ts file.
-            
+
         </div>
     )
 }

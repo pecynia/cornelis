@@ -43,7 +43,7 @@ model User {
   name            String?
   email           String?   @unique
   role            String   @default("user")
-  hashedPassword  String  @map("hashed_password") @db.Text
+  hashedPassword  String?  @map("hashed_password") @db.Text
   emailVerified   DateTime? @map("email_verified")
   image           String?
   accounts        Account[]

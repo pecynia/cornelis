@@ -40,11 +40,11 @@ export default function VerifyEmailPage() {
         resolver: yupResolver(validationSchema),
         defaultValues: {
             email: email,
-            token: ''
+            token: token // Initialize token if provided in URL
         }
     })
 
-    // Check if the email is already verified, but only if there is no token
+    // Check if the email is already verified
     useEffect(() => {
         const checkEmailVerification = async () => {
             if (email && !token) {
@@ -58,14 +58,13 @@ export default function VerifyEmailPage() {
         checkEmailVerification()
     }, [email, token, lang, router])
 
-    // If email is provided, set it in the form
+    // Set form values from URL parameters
     useEffect(() => {
-        if (email) {
-            setValue('email', email)
-        }
-    }, [email, setValue])
+        if (email) setValue('email', email)
+        if (token) setValue('token', token)
+    }, [email, token, setValue])
 
-    // Automatically submit the form if both email and token are provided
+    // Automatically submit if both email and token are provided
     useEffect(() => {
         if (email && token) {
             handleFormSubmit({ email, token })
@@ -77,31 +76,57 @@ export default function VerifyEmailPage() {
         setVerificationError(null)
         setIsTokenExpired(false)
 
-        const result = await verifyEmail(data.email, data.token)
+        try {
+            // First verify the email
+            const verifyResult = await verifyEmail(data.email, data.token)
 
-        if (result.success) {
-            await signIn('credentials', {
-                redirect: false,
-                email: data.email,
-                callbackUrl: `/${lang}/dashboard`, // Redirect to the dashboard after sign-in
-            })
-        } else {
-            if (result.expired) {
-                setIsTokenExpired(true)
+            if (!verifyResult.success) {
+                if (verifyResult.expired) {
+                    setIsTokenExpired(true)
+                }
+                setVerificationError(verifyResult.message)
+                return
             }
-            setVerificationError(result.message)
-        }
 
-        setIsSubmitting(false)
+            // Only attempt sign in if verification was successful
+            const signInResult = await signIn('credentials', {
+                email: data.email,
+                verificationToken: data.token,
+                redirect: false,
+            })
+
+            if (signInResult?.error) {
+                console.error('Sign in error:', signInResult.error)
+                setVerificationError("Error signing in after verification")
+                return
+            }
+
+            if (signInResult?.ok) {
+                router.push(`/${lang}/dashboard`)
+            }
+        } catch (error) {
+            console.error('Verification error:', error)
+            setVerificationError("Error during verification process")
+        } finally {
+            setIsSubmitting(false)
+        }
     }
 
     const handleResendToken = async () => {
         if (!email) return
-        const result = await initiateEmailVerification(email, 'code')
-        if (result.success) {
-            toast('Verification code has been resent to your email.')
-        } else {
-            setVerificationError(result.message)
+
+        try {
+            const result = await initiateEmailVerification(email, 'code')
+            if (result.success) {
+                toast('Verification code has been resent to your email.')
+                setIsTokenExpired(false) // Reset expired state after sending new token
+                setVerificationError(null) // Clear any existing errors
+            } else {
+                setVerificationError(result.message)
+            }
+        } catch (error) {
+            console.error('Error resending token:', error)
+            setVerificationError("Error sending verification code")
         }
     }
 
@@ -118,14 +143,14 @@ export default function VerifyEmailPage() {
                             <Input
                                 id='email'
                                 type='email'
-                                disabled={!!email} // Disable if email is provided
+                                disabled={!!email}
                                 className='mt-1 block w-full text-sm py-2 px-3 border border-gray-300 rounded-md'
                                 placeholder='Vul je e-mail in'
                                 {...register('email')}
                             />
-                            {errors['email'] ? (
-                                <div className='text-sm text-red-500'>{errors['email'].message}</div>
-                            ) : null}
+                            {errors.email && (
+                                <div className='text-sm text-red-500'>{errors.email.message}</div>
+                            )}
                         </div>
 
                         <div className='space-y-2 mt-2'>
@@ -139,13 +164,13 @@ export default function VerifyEmailPage() {
                                 placeholder='Vul je token in'
                                 {...register('token')}
                             />
-                            {errors['token'] ? (
-                                <div className='text-sm text-red-500'>{errors['token'].message}</div>
-                            ) : null}
+                            {errors.token && (
+                                <div className='text-sm text-red-500'>{errors.token.message}</div>
+                            )}
                         </div>
 
                         {verificationError && (
-                            <div className='text-sm text-red-500'>{verificationError}</div>
+                            <div className='text-sm text-red-500 mt-2'>{verificationError}</div>
                         )}
 
                         <Button
@@ -158,15 +183,14 @@ export default function VerifyEmailPage() {
                                     <ReloadIcon className="mr-2 h-4 w-4 animate-spin" /> Verifying...
                                 </>
                             ) : (
-                                <>
-                                    Verify Email
-                                </>
+                                'Verify Email'
                             )}
                         </Button>
 
-                        {isTokenExpired && (
+                        {(isTokenExpired || verificationError) && (
                             <Button
                                 type='button'
+                                variant="outline"
                                 onClick={handleResendToken}
                                 className='mt-3 w-full py-2 px-4 rounded'
                             >

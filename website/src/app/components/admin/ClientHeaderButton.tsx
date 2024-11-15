@@ -9,15 +9,15 @@ const ClientHeaderButtonWrapper = ({ lang }: { lang: Locale }) => {
 
     return (
         <>
-            <div className='text-black items-center justify-center flex-col flex'>
-                {session?.user?.id && `User ID: ${session.user.id}`} 
-                {session?.user?.role && `Role: ${session.user.role}`} 
-                {session?.user?.email && `Email: ${session.user.email}`} 
-                {session?.user?.emailVerified && `Email Verified: ${session.user.emailVerified}`}
-                {session?.user?.hashedPassword && `Password: ${session.user.hashedPassword}`}
-                {session?.user?.name && `Name: ${session.user.name}`}
-            </div>
             {session && <HeaderButton lang={lang} />}
+            <div className='text-black items-left justify-center flex-col flex p-10'>
+                <p>{session?.user?.id && `User ID: ${session.user.id}`} </p>
+                <p>{session?.user?.role && `Role: ${session.user.role}`} </p>
+                <p>{session?.user?.email && `Email: ${session.user.email}`} </p>
+                <p>{session?.user?.emailVerified && `Email Verified: ${session.user.emailVerified}`}</p>
+                <p>{session?.user?.hashedPassword && `Password: ${session.user.hashedPassword}`}</p>
+                <p>{session?.user?.name && `Name: ${session.user.name}`}</p>
+            </div>
         </>
     )
 }
